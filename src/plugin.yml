@@ -1,0 +1,7 @@
+name: maze-pathfinder
+version: 1.0
+main: com.treephones.pathfinder.Main
+description: Finds solution to build maze and goes through it.
+api-version: 1.13
+commands:
+  
