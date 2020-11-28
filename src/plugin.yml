@@ -4,4 +4,5 @@ main: com.treephones.pathfinder.Main
 description: Finds solution to build maze and goes through it.
 api-version: 1.13
 commands:
-  
+  pathfinder:
+    description: starts and stops pathfinding
