@@ -10,7 +10,15 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class Pathfinder extends BukkitRunnable {
 	
-	ArrayList<Location> path = new ArrayList<Location>();
+	Location start;
+	Material end;
+	ArrayList<Location> paths;
+	
+	public Pathfinder(Location startLocation, Material endBlock) {
+		this.start = startLocation;
+		this.end = endBlock;
+		this.paths = new ArrayList<Location>();
+	}
 	
 	@Override
 	public void run() {
@@ -56,4 +64,5 @@ public class Pathfinder extends BukkitRunnable {
 		}
 		return blocks;
 	}
+	
 }
