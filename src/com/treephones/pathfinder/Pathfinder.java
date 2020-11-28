@@ -1,6 +1,7 @@
 package com.treephones.pathfinder;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -35,12 +36,13 @@ public class Pathfinder extends BukkitRunnable {
 		}
 		catch(Exception e) {
 			sender.sendMessage(ChatColor.RED + "Something went wrong!");
+			e.printStackTrace();
 		}
 	}
 	
 	//dfs pathfinding
 	public boolean pathfinder(Location position, ArrayList<Location> explored) {
-		if(this.getBlocksAtCoords(this.getSurroundingCoords(position)).contains(Material.EMERALD_BLOCK)) {
+		if(this.getBlocksAtCoords(this.getSurroundingCoords(position)).contains(this.end)) {
 			explored.add(position);
 			return true;
 		}
@@ -69,11 +71,13 @@ public class Pathfinder extends BukkitRunnable {
 		s.add(new Location(world, x, y, z+1));
 		s.add(new Location(world, x, y, z-1));
 		//make sure is a path
+		List<Location> remove = new ArrayList<Location>();
 		for(Location l : s) {
 			if(new Location(world, l.getX(), l.getY()+1, l.getZ()).getBlock().getType() != Material.AIR) {
-				s.remove(l);
+				remove.add(l);
 			}
 		}
+		s.removeAll(remove);
 		return s;
 	}
 	

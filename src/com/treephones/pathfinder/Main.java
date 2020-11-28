@@ -10,7 +10,7 @@ public class Main extends JavaPlugin {
 	
 	@Override
 	public void onEnable() {
-		
+		this.getCommand("pathfinder").setExecutor(new Commands(this));
 	}
 	
 	@Override
