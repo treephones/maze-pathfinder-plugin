@@ -9,20 +9,25 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class Pathfinder extends BukkitRunnable {
 	
+	Main plugin;
 	Location start;
 	Material end;
 	ArrayList<Location> path;
 	CommandSender sender;
+	Player player;
 	
-	public Pathfinder(Location startLocation, Material endBlock, CommandSender sender) {
+	public Pathfinder(Main plugin, Location startLocation, Material endBlock, CommandSender sender) {
+		this.plugin = plugin;
 		this.start = this.cleanLocation(startLocation);
 		this.end = endBlock;
 		this.path = new ArrayList<Location>();
 		this.sender = sender;
+		this.player = (Player)sender;
 	}
 	
 	@Override
@@ -30,7 +35,15 @@ public class Pathfinder extends BukkitRunnable {
 		try {
 			this.pathfinder(this.start, new ArrayList<Location>());
 			for(Location pathPos : this.reverse(this.path)) {
-				pathPos.getBlock().setType(Material.BLUE_WOOL);
+				Location player_pathpos = new Location(Bukkit.getWorld("world"), pathPos.getX(), pathPos.getY()+1, pathPos.getZ());
+				Player local_player = this.player;
+				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
+					@Override
+					public void run() {
+						pathPos.getBlock().setType(Material.BLUE_WOOL);
+						local_player.teleport(player_pathpos);
+					}
+				}, 20);
 			}
 			this.sender.sendMessage(ChatColor.GREEN + "Solution to maze found!");
 		}
@@ -102,4 +115,5 @@ public class Pathfinder extends BukkitRunnable {
 	public Location cleanLocation(Location l) {
 		return new Location(Bukkit.getWorld("world"), (int)l.getX(), l.getY(), l.getZ());
 	}
+	
 }

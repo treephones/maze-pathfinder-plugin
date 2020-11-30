@@ -23,7 +23,7 @@ public class Commands implements CommandExecutor {
 			Location ploc = p.getLocation();
 			Location location = new Location(Bukkit.getWorld("world"), ploc.getX(), ploc.getY()-1, ploc.getZ());
 			if(location.getBlock().getType() == this.plugin.startBlock) {
-				this.pathfinder = new Pathfinder(location, this.plugin.endBlock, sender);
+				this.pathfinder = new Pathfinder(this.plugin, location, this.plugin.endBlock, sender);
 				sender.sendMessage(ChatColor.GREEN + "Started pathfinding...");
 				this.pathfinder.run();
 			}
