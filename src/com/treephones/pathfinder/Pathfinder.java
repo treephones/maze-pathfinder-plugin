@@ -10,46 +10,60 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPistonExtendEvent;
 
-public class Pathfinder extends BukkitRunnable {
+public class Pathfinder implements Listener {
 	
 	Main plugin;
 	Location start;
 	Material end;
-	ArrayList<Location> path;
+	ArrayList<Location> path = new ArrayList<Location>();;
+	int indexCache = 0;
 	CommandSender sender;
 	Player player;
+	Location trigger;
 	
-	public Pathfinder(Main plugin, Location startLocation, Material endBlock, CommandSender sender) {
-		this.plugin = plugin;
-		this.start = this.cleanLocation(startLocation);
-		this.end = endBlock;
-		this.path = new ArrayList<Location>();
-		this.sender = sender;
-		this.player = (Player)sender;
+	public Pathfinder(Main plugin) {
+		//init
 	}
 	
-	@Override
-	public void run() {
+	public Pathfinder(Main plugin, Location startLocation, Material endBlock, CommandSender sender) {
+		Bukkit.getPluginManager().registerEvents(this, plugin);
+		this.plugin = plugin;
+		this.start = this.cleanLocation(startLocation);
+		this.end = endBlock; 
+		this.sender = sender;
+		this.player = (Player)sender;
+		this.trigger = new Location(Bukkit.getWorld("world"), 791, 4, 2351);
 		try {
-			this.pathfinder(this.start, new ArrayList<Location>());
-			for(Location pathPos : this.reverse(this.path)) {
-				Location player_pathpos = new Location(Bukkit.getWorld("world"), pathPos.getX(), pathPos.getY()+1, pathPos.getZ());
-				Player local_player = this.player;
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(this.plugin, new Runnable() {
-					@Override
-					public void run() {
-						pathPos.getBlock().setType(Material.BLUE_WOOL);
-						local_player.teleport(player_pathpos);
-					}
-				}, 20);
+			if(this.plugin.started) {
+				this.pathfinder(this.start, new ArrayList<Location>());
+				this.path = this.reverse(this.path);
+				this.sender.sendMessage(ChatColor.GREEN + "Solution to maze found!");
 			}
-			this.sender.sendMessage(ChatColor.GREEN + "Solution to maze found!");
 		}
 		catch(Exception e) {
 			sender.sendMessage(ChatColor.RED + "Something went wrong!");
-			e.printStackTrace();
+		}
+	}
+
+	@EventHandler
+	public void moveTickEvent(BlockPistonExtendEvent e) {
+		this.sender.sendMessage(ChatColor.BLUE + "Moved.");
+		if(this.plugin.started && this.indexCache < this.path.size()) {
+			Location pathPos = this.path.get(this.indexCache);
+			Location player_pathpos = new Location(Bukkit.getWorld("world"), pathPos.getX(), pathPos.getY()+1, pathPos.getZ());
+			pathPos.getBlock().setType(Material.BLUE_WOOL);
+			this.player.teleport(player_pathpos);
+			++this.indexCache;
+			
+			this.trigger.getBlock().setType(Material.REDSTONE_BLOCK);
+			this.trigger.getBlock().setType(Material.AIR);
+		}
+		else {
+			this.sender.sendMessage(ChatColor.GREEN + "You are at the end of the maze!");
 		}
 	}
 	
